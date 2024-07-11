@@ -75,10 +75,9 @@ class CartesianImpedance(LeafSystem):
         
         pd_rot = (self._kp[:3] * rot_error) - (self._kd[:3] * (J_ee[:3,:] @ dq))
         pd_t   = (self._kp[3:] * translation_error) - (self._kd[3:] * (J_ee[3:,:] @ dq))
-        pd = np.concatenate((pd_rot, pd_t))
+        fu = np.concatenate((pd_rot, pd_t))
         
         
-        f_u = pd
-        u = J_ee.T @ f_u - tau_g - C
+        u = (J_ee.T @ fu) - tau_g - C
         
         output.SetFromVector(u)

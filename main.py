@@ -33,7 +33,7 @@ if __name__ == '__main__':
     load_iiwa_setup(plant, scene_graph)
     plant.Finalize()
     
-    JOINT0 = np.array([0.0, np.pi/6, 0.0, -80*np.pi/180, 0.0, np.pi/6, 0.0])
+    JOINT0 = np.array([0.0, np.pi/6, 0.0, -80*np.pi/180, 0.0, 0.0, 0.0])
     ENDTIME = 10.0
     
     plant_context = plant.CreateDefaultContext()
@@ -41,12 +41,12 @@ if __name__ == '__main__':
     ee_pose0 = plant.CalcRelativeTransform(plant_context, plant.world_frame(), plant.GetBodyByName("iiwa_link_7").body_frame())
     
     # rpy_desired_rot = RollPitchYaw(ee_pose0.rotation()).vector()
-    rpy_desired_rot = RollPitchYaw(0, np.pi/2, 0).vector()
-    desired_trans = ee_pose0.translation() - np.array([0.1, 0.0, 0.05])
+    rpy_desired_rot = RollPitchYaw(0, np.pi, 0).vector()
+    desired_trans = ee_pose0.translation() - np.array([0.2, 0.0, 0.3])
     desired_pose = np.hstack((rpy_desired_rot, desired_trans))
     
-    kp = np.array([30.0, 30.0, 30.0, 700.0, 700.0, 700.0])
-    kd = np.array([10.0, 10.0, 10.0, 200.0, 200.0, 200.0])
+    kp = np.array([70.0, 70.0, 70.0, 1000.0, 1000.0, 1000.0])
+    kd = np.array([20.0, 20.0, 20.0, 500.0, 500.0, 500.0])
     controller_block = builder.AddSystem(CartesianImpedance(plant, kp, kd))
     desired_pose_block = builder.AddSystem(ConstantVectorSource(desired_pose))
     
@@ -61,9 +61,9 @@ if __name__ == '__main__':
     plant_context = plant.GetMyContextFromRoot(simulator.get_mutable_context())
     plant.SetPositions(plant_context, JOINT0)
     simulator.Initialize()
-    simulator.set_target_realtime_rate(1.0)
+    simulator.set_target_realtime_rate(10000.0)
     meshcat.StartRecording()
-    simulator.AdvanceTo(ENDTIME+5.0)
+    simulator.AdvanceTo(ENDTIME)
     meshcat.StopRecording()
     meshcat.PublishRecording()
     
